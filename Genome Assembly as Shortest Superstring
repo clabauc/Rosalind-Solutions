@@ -1,0 +1,50 @@
+Sample Dataset:
+>Rosalind_56
+ATTAGACCTG
+>Rosalind_57
+CCTGCCGGAA
+>Rosalind_58
+AGACCTGCCG
+>Rosalind_59
+GCCGGAATAC
+
+Sample Output:
+ATTAGACCTGCCGGAATAC
+
+#########################################################################################################################################################################
+
+import networkx as nx
+from Bio import SeqIO
+
+def construct_superstring(kmers):
+    g = nx.DiGraph()
+    k = len(kmers[0])//2
+
+    for kmer in kmers:
+        for i in range(len(kmer) - k + 1):
+            seq = kmer[i:i+k]
+            node1 = seq[:-1]
+            node2 = seq[1:]
+            g.add_edge(node1, node2)
+
+    path = list(nx.algorithms.eulerian_path(g))
+    superstring = path[0][0]
+
+    for node1, node2 in path:
+        superstring += node2[-1]
+
+    return superstring
+
+
+if __name__ == "__main__":
+
+    fasta_file = "short_super.txt"
+    seq_id, seqs = [], []
+    with open(fasta_file, 'r') as fa:
+        for sequence in SeqIO.parse(fa, 'fasta'):
+            seq_id.append(str(sequence.name))
+            seqs.append(str(sequence.seq))
+
+
+    constructed = construct_superstring(seqs)
+    print(constructed)
