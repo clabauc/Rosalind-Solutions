@@ -1,0 +1,73 @@
+
+Given: A collection of up to 1000 reads of equal length (at most 50 bp) in FASTA format. Some of these reads were generated with a single-nucleotide error. For each read s
+ in the dataset, one of the following applies:
+
+  s was correctly sequenced and appears in the dataset at least twice (possibly as a reverse complement);
+  s is incorrect, it appears in the dataset exactly once, and its Hamming distance is 1 with respect to exactly one correct read in the dataset (or its reverse complement).
+
+Return: A list of all corrections in the form "[old read]->[new read]". (Each correction must be a single symbol substitution, and you may return the corrections in any order.)
+
+
+
+############################################################################################################################################################
+
+
+
+
+
+def correct_seqs(strings):
+    corrected = []
+    correct, incorrect = separator(strings)
+    for seq1 in incorrect:
+        for seq2 in correct:
+            if hamming_distance(seq1, seq2) == 1:
+                corrected.append([seq1, seq2])
+    return corrected
+
+
+def sequence_dict(strings):
+    counts = defaultdict(int)
+    for string in strings:
+        rev_comp = str(Seq(string).reverse_complement())
+        counts[string] +=1
+        counts[rev_comp] +=1
+    return counts
+
+def hamming_distance(s1, s2):
+    dist = sum([1 for i in range(len(s1)) if s1[i] != s2[i]])
+    return dist
+    
+
+def separator(strings):
+    correct = []
+    incorrect = []
+    counts = sequence_dict(strings)
+    for key, value in counts.items():
+        if value >= 2:
+            correct.append(key)
+        elif key in strings:
+            incorrect.append(key)
+    return correct, incorrect
+
+if __name__ == "__main__":
+
+    from collections import defaultdict
+    from Bio.Seq import Seq
+    from Bio import SeqIO
+
+    fasta_file = "rosalind_corr (2).txt"
+    seqs = []
+    with open(fasta_file, 'r') as fa:
+        for sequence in SeqIO.parse(fa, 'fasta'):
+            seqs.append(str(sequence.seq))
+    
+    corrections = correct_seqs(seqs)
+    for x in corrections:
+        print("{}->{}".format(x[0], x[1]))
+        
+        
+        
+        
+        
+        
+        
