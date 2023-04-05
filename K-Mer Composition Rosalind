@@ -1,0 +1,52 @@
+
+For a fixed positive integer k, order all possible k-mers taken from an underlying alphabet lexicographically.
+
+Then the k-mer composition of a string scan be represented by an array Afor which A[m]denotes the number of times that the mth k-mer (with respect to the lexicographic order) appears in s
+
+
+Given: A DNA string s in FASTA format (having length at most 100 kbp).
+
+Return: The 4-mer composition of s
+
+
+
+#################################################################################################################################################################
+
+
+
+def ordered_kmers(seq, k):
+    results = []
+    kmers_dict = (kmer_dict(seq, k))
+    for kmer in sorted(kmers_dict.keys()):
+        results.append(kmers_dict[kmer])
+    return results
+
+
+def kmer_dict(seq, k):
+    kmers_dict = {}
+    for kmer in possible_kmers(k):
+        kmers_dict[kmer] = 0
+    for i in range(len(seq)-k+1):
+        kmer = seq[i:i+k]
+        kmers_dict[kmer] += 1
+    return kmers_dict
+
+def possible_kmers(k):
+    return [''.join(x) for x in product('ATGC', repeat=k)]
+
+
+
+if __name__ == "__main__":
+
+    from Bio import SeqIO
+    from itertools import product
+
+    k = 4
+    seq = ""
+
+    with open('rosalind_kmer (1).txt', 'r') as fa:
+        for sequences in SeqIO.parse(fa, 'fasta'):
+            seq += (str(sequences.seq))
+
+    ans_kmer = ordered_kmers(seq, k)
+    print(*ans_kmer)
