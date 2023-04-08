@@ -1,0 +1,62 @@
+
+Problem
+A string u is a common subsequence of strings s and t if the symbols of u appear in order as a subsequence of both s and t. 
+For example, "ACTG" is a common subsequence of "AACCTTGG" and "ACACTGTGA".
+
+Analogously to the definition of longest common substring, u is a longest common subsequence of s and t 
+if there does not exist a longer common subsequence of the two strings. Continuing our above example, 
+"ACCTTG" is a longest common subsequence of "AACCTTGG" and "ACACTGTGA", as is "AACTGG".
+
+Given: Two DNA strings s and t (each having length at most 1 kbp) in FASTA format.
+
+Return: A longest common subsequence of s and t. (If more than one solution exists, you may return any one.)
+
+
+
+
+
+
+
+###################################################################################################################################################################
+
+
+def shared_spliced_motif(seq1, seq2):
+    motif = ""
+    l1, l2 = len(seq1), len(seq2)
+
+    subs = [[0 for j in range(l2 + 1)] for i in range(l1 + 1)]
+
+    for x in range(l1):
+        for y in range(l2):
+            if seq1[x] == seq2[y]:
+                subs[x+1][y+1] = subs[x][y] + 1
+            else:
+                subs[x+1][y+1] = max(subs[x + 1][y], subs[x][y + 1])
+
+    i = l1
+    j = l2
+    while i * j != 0:
+        if subs[i - 1][j] == subs[i][j]:
+            i -= 1
+        elif subs[i][j - 1] == subs[i][j]:
+            j -= 1
+        else:
+            motif = seq1[i - 1] + motif
+            i -= 1
+            j -= 1
+                
+    return motif
+
+
+if __name__ == "__main__":
+
+    from Bio import SeqIO
+
+    seqs = []
+    with open("shared_spliced_motif_prac.txt", 'r') as fa:
+        for sequence in SeqIO.parse(fa, 'fasta'):
+            seqs.append(str(sequence.seq))
+
+    s1, s2 = seqs[0], seqs[1]
+    motif = shared_spliced_motif(s1, s2)
+    print(motif)
